@@ -8,7 +8,16 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createLocalClient() {
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+  const connectionString =
+    process.env.RESTAURANTSEVEN02_DATABASE_URL_POOLED ??
+    process.env.RESTAURANTSEVEN02_DATABASE_URL ??
+    process.env.RESTAURANTSEVEN02_PRISMA_DATABASE_URL ??
+    process.env.RESTAURANTSEVEN02_POSTGRES_URL ??
+    process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("Set RESTAURANTSEVEN02_DATABASE_URL_POOLED or DATABASE_URL.");
+  }
+  const adapter = new PrismaPg({ connectionString });
   return new PrismaClient({ adapter });
 }
 
