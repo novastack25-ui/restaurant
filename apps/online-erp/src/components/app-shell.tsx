@@ -62,6 +62,19 @@ export function AppShell({
   const pathname = usePathname();
   const { t, locale, setLocale } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [accountName, setAccountName] = useState("");
+  useEffect(() => {
+    let active = true;
+    const refreshAccountName = () => {
+      void fetch("/api/auth/session", { cache: "no-store" })
+        .then(async (response) => response.ok ? response.json() : null)
+        .then((result) => { if (active && result?.session?.name) setAccountName(result.session.name as string); })
+        .catch(() => {});
+    };
+    refreshAccountName();
+    window.addEventListener("erp:profile-updated", refreshAccountName);
+    return () => { active = false; window.removeEventListener("erp:profile-updated", refreshAccountName); };
+  }, []);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
@@ -206,10 +219,10 @@ export function AppShell({
           </button>
           <button className="hidden sm:flex items-center gap-2 ps-2">
             <span className="size-9 rounded-full bg-primary-soft text-primary grid place-items-center text-sm font-bold">
-              MH
+              {accountName.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toLocaleUpperCase() || "—"}
             </span>
             <span className="text-sm text-start">
-              <b className="block">Maya Haddad</b>
+              <b className="block">{accountName || (locale === "ar" ? "الحساب" : "Account")}</b>
               <small className="text-muted">{t("admin")}</small>
             </span>
             <ChevronDown size={15} />
