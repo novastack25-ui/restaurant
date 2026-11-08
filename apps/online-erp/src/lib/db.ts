@@ -1,5 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
+import { normalizeDatabaseUrl } from "../../database-url";
 
 // Global cache for primary (local) database
 const globalForPrisma = globalThis as unknown as { 
@@ -17,7 +18,7 @@ function createLocalClient() {
   if (!connectionString) {
     throw new Error("Set RESTAURANTSEVEN02_DATABASE_URL_POOLED or DATABASE_URL.");
   }
-  const adapter = new PrismaPg({ connectionString });
+  const adapter = new PrismaPg({ connectionString: normalizeDatabaseUrl(connectionString) });
   return new PrismaClient({ adapter });
 }
 
@@ -32,7 +33,7 @@ export function getCloudDb(): PrismaClient | null {
   }
   if (!globalForPrisma.cloudPrisma) {
     try {
-      const adapter = new PrismaPg({ connectionString: cloudUrl });
+      const adapter = new PrismaPg({ connectionString: normalizeDatabaseUrl(cloudUrl) });
       globalForPrisma.cloudPrisma = new PrismaClient({ adapter });
     } catch (err) {
       console.warn("Could not initialize cloud database connection", err);

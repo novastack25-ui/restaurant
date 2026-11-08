@@ -54,8 +54,8 @@ export async function GET() {
       status: "fail",
       detailsAr: `فشل الاتصال بقاعدة البيانات: ${(err as Error).message}`,
       detailsEn: `Database connection failed: ${(err as Error).message}`,
-      fixAr: "تحقق من متغير DATABASE_URL ووجود sslmode=require والاتصال بالإنترنت.",
-      fixEn: "Verify DATABASE_URL with sslmode=require and check internet connection.",
+      fixAr: "تحقق من متغير DATABASE_URL ووجود sslmode=verify-full والاتصال بالإنترنت.",
+      fixEn: "Verify DATABASE_URL with sslmode=verify-full and check internet connection.",
     });
   }
 
